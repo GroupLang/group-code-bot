@@ -15,7 +15,6 @@ from services.bot.messages import (
 from services.client import AgentMarketClient
 from services.request_tracker import RequestTracker
 from services.bot.provider import send_message_to_provider, parse_provider_mention
-from services.bot.github import parse_github_issue
 from utils.telegram_utils import send_message
 
 BOT_MENTION_PATTERN = r'@group_code_bot\s+(.*)'
@@ -197,8 +196,7 @@ async def handle_message(message: Dict[str, Any]) -> None:
             await handle_code_request(message)
             return
     
-    # Handle other text messages (including commands)
-    await handle_text_message(message)
+    await handle_command(message)
     
 
 def parse_bot_mention(text: str) -> Optional[str]:
@@ -207,17 +205,15 @@ def parse_bot_mention(text: str) -> Optional[str]:
     return match.group(1) if match else None
 
 
-
 async def handle_command(message: Dict[str, Any], command: str) -> bool:
     """Handle bot commands"""
     chat_id = message['chat']['id']
-    text = message['text']
     
-    if command == '/help':
+    if command.startswith('/help'):
         send_message(chat_id, HELP_MESSAGE)
         return True
         
-    if command == '/submit_reward':
+    if command.startswith('/submit_reward'):
         await handle_submit_reward(message)
         return True
         
@@ -234,7 +230,7 @@ async def handle_submit_reward(message: Dict[str, Any]) -> None:
         
     instance_id = parts[1]
     try:
-        amount = float(parts[2])
+        amount = float(parts[2].replace(',', '.'))
         async with AgentMarketClient() as client:
             await client.report_reward(instance_id, amount)
         send_message(chat_id, REWARD_SUCCESS.format(amount=amount, instance_id=instance_id))
@@ -243,20 +239,6 @@ async def handle_submit_reward(message: Dict[str, Any]) -> None:
     except Exception as e:
         logger.error(f"Error submitting reward: {e}")
         send_message(chat_id, f"❌ Failed to submit reward: {str(e)}")
-
-async def handle_text_message(message: Dict[str, Any]) -> None:
-    """Handle text messages including commands"""
-    text = message['text']
-
-    # Handle commands
-    if text.startswith('/'):
-        await handle_command(message, text.split()[0])
-        return
-
-    # Check for GitHub issue links
-    issue_info = parse_github_issue(text)
-    if issue_info:
-        await handle_github_issue_link(message)
 
 async def initialize_bot() -> None:
     """Initialize bot settings and configurations"""
