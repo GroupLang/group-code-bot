@@ -181,7 +181,7 @@ async def handle_message(message: Dict[str, Any]) -> None:
     # Handle commands first
     if text.startswith('/'):
         # Extract the command by removing the @ portion if present
-        command = text.split('@')[0].split()[0][1:]  # This will convert "/help@group_code_bot" to "help"
+        command = text.split('@')[0]  # This will convert "/help@group_code_bot" to "help"
         await handle_command(message, command)
         return
     
