@@ -3,13 +3,13 @@ import requests
 from typing import List, Dict
 from loguru import logger
 
-def set_bot_commands(chat_id: int) -> None:
-    """Set up the bot's commands for a group chat.
+def get_bot_commands() -> list:
+    """Get the list of bot commands and their descriptions.
     
-    Args:
-        chat_id: Telegram chat ID to set commands for
+    Returns:
+        List of command dictionaries with command and description
     """
-    commands = [
+    return [
         {
             "command": "help",
             "description": "Show help message"
@@ -19,13 +19,19 @@ def set_bot_commands(chat_id: int) -> None:
             "description": "Submit reward for an instance"
         }
     ]
+
+def set_bot_commands(chat_id: int) -> None:
+    """Set up the bot's commands for a specific chat.
     
+    Args:
+        chat_id: Telegram chat ID to set commands for
+    """
     token = os.environ['GROUPWRITE_TELEGRAM_BOT_TOKEN']
     commands_url = f"https://api.telegram.org/bot{token}/setMyCommands"
     
     try:
         response = requests.post(commands_url, json={
-            "commands": commands,
+            "commands": get_bot_commands(),
             "chat_id": chat_id
         })
         response.raise_for_status()
@@ -44,19 +50,8 @@ async def initialize_bot() -> None:
         
     # Set global bot commands
     commands_url = f"https://api.telegram.org/bot{token}/setMyCommands"
-    commands = [
-        {
-            "command": "help",
-            "description": "Show help message"
-        },
-        {
-            "command": "submit_reward", 
-            "description": "Submit reward for an instance"
-        }
-    ]
-    
     try:
-        response = requests.post(commands_url, json={"commands": commands})
+        response = requests.post(commands_url, json={"commands": get_bot_commands()})
         response.raise_for_status()
         logger.info("Successfully set global bot commands")
     except Exception as e:

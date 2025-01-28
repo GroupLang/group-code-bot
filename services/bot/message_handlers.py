@@ -28,7 +28,7 @@ from utils.errors import (
 from .base_handler import BaseHandler
 from .message_types import BaseMessage, TextMessage, NewChatMemberMessage
 from .context import MessageContext
-from .github import handle_github_issue_link
+from .github import handle_github_issue
 from .provider import parse_provider_mention, send_message_to_provider
 from .initialization import set_bot_commands
 
@@ -193,7 +193,7 @@ class MessageHandler(BaseHandler):
 
             # Check for GitHub issue links
             if 'github.com' in text.lower():
-                await handle_github_issue_link(message)
+                await handle_github_issue(message.chat.id, *parse_github_issue(text))
                 return
 
             # Check for bot mentions

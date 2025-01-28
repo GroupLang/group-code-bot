@@ -4,7 +4,7 @@ from typing import Dict, Type, Optional
 from loguru import logger
 
 from .base_handler import BaseHandler
-from .message_types import BaseMessage, CommandMessage, CodeRequest, ProviderMessage, GitHubIssue
+from .message_types import BaseMessage, CodeRequest, ProviderMessage, GitHubIssue
 from .context import MessageContext
 from utils.errors import ValidationError, TelegramError, handle_error
 from utils.errors import error_context
