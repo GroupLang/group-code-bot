@@ -5,16 +5,10 @@ used throughout the application, particularly for Telegram API interactions and
 instance tracking.
 """
 
-from typing import Optional, Dict, Any, TypedDict, List, Union
+from typing import Optional, Dict, Any, List
 from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel, Field, validator, HttpUrl
-
-# Type aliases for Telegram types
-TelegramUpdate = Dict[str, Any]  # Base type for Telegram updates
-TelegramMessage = Dict[str, Any]  # Type for message objects
-TelegramUser = Dict[str, Any]    # Type for user objects
-TelegramChat = Dict[str, Any]    # Type for chat objects
 
 class RequestMetadata(BaseModel):
     """Metadata associated with an instance request."""

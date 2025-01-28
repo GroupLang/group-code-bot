@@ -1,6 +1,6 @@
 import requests
 import os
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any, Optional
 
 def send_message(chat_id: int, text: str, reply_markup: Optional[Dict] = None, 
                 reply_to_message_id: Optional[int] = None, parse_mode: Optional[str] = 'Markdown') -> Dict[str, Any]:
