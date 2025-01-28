@@ -1,14 +1,12 @@
 import asyncio
+import json
 import os
 from datetime import datetime
-from typing import List, Dict, Any, Optional
 from services.request_tracker import RequestTracker
 from services.client import AgentMarketClient
 from utils.message_utils import process_instance_messages
 from bot_handlers import handle_update
 from loguru import logger
-from datetime import datetime, timedelta
-import json
 
 _RESOLVED_STATUS = 3
 

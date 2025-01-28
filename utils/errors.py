@@ -10,7 +10,6 @@ This module provides a comprehensive error handling framework including:
 import sys
 import traceback
 import json
-import logging
 from datetime import datetime
 from typing import Any, Dict, Optional, Type, Callable, TypeVar
 from functools import wraps
@@ -18,8 +17,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from loguru import logger
 
-# Type variables for generics
-T = TypeVar('T')
+# Type variable for generics
 F = TypeVar('F', bound=Callable[..., Any])
 
 class BaseError(Exception):

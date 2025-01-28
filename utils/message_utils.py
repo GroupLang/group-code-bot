@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Optional
 from loguru import logger
 from services.client import AgentMarketClient
 from services.request_tracker import RequestTracker

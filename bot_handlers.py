@@ -1,7 +1,7 @@
 import os
 import re
-import time
-from typing import Dict, Any, Optional
+import asyncio
+from typing import Dict, Any
 import requests
 from loguru import logger
 
@@ -92,7 +92,7 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
                 logger.error(f"Error adding repository: {e}")
                 return 
 
-            time.sleep(10)
+            await asyncio.sleep(10)
 
             # Retrieve the issue and get the instance_id
             issues = await client.get_repository_issues(repo_url=issue_url)
@@ -244,31 +244,29 @@ async def handle_submit_reward(message: Dict[str, Any]) -> None:
         logger.error(f"Error submitting reward: {e}")
         send_message(chat_id, f"❌ Failed to submit reward: {str(e)}")
 
+BOT_COMMANDS = [
+    {
+        "command": "help",
+        "description": "Show help message"
+    },
+    {
+        "command": "submit_reward",
+        "description": "Submit reward for an instance"
+    }
+]
+
 async def initialize_bot() -> None:
     """Initialize bot settings and configurations"""
     logger.info("Initializing bot...")
     
-    # Set up default commands for the bot
     token = os.environ.get('GROUPWRITE_TELEGRAM_BOT_TOKEN')
     if not token:
         logger.error("Bot token not found in environment variables")
         return
         
-    # Set global bot commands
     commands_url = f"https://api.telegram.org/bot{token}/setMyCommands"
-    commands = [
-        {
-            "command": "help",
-            "description": "Show help message"
-        },
-        {
-            "command": "submit_reward",
-            "description": "Submit reward for an instance"
-        }
-    ]
-    
     try:
-        response = requests.post(commands_url, json={"commands": commands})
+        response = requests.post(commands_url, json={"commands": BOT_COMMANDS})
         response.raise_for_status()
         logger.info("Successfully set global bot commands")
     except Exception as e:
@@ -276,31 +274,17 @@ async def initialize_bot() -> None:
 
 def set_bot_commands(chat_id: int) -> None:
     """Set up the bot's commands for a group chat with proper scope and language support."""
-    
-    commands = [
-        {
-            "command": "help",
-            "description": "Show help message"
-        },
-        {
-            "command": "submit_reward",
-            "description": "Submit reward for an instance"
-        }
-    ]
-    
     token = os.environ['GROUPWRITE_TELEGRAM_BOT_TOKEN']
-    
-    # Set commands with proper scope for the specific group chat
     commands_url = f"https://api.telegram.org/bot{token}/setMyCommands"
-    # Commands by chat_id
+    
     commands_payload = {
-        "commands": commands,
+        "commands": BOT_COMMANDS,
         "chat_id": chat_id
     }
     
     try:
         commands_response = requests.post(commands_url, json=commands_payload)
-        commands_response.raise_for_status()  # Raise exception for non-200 status codes
-        print(f"Successfully set commands for chat {chat_id}")
+        commands_response.raise_for_status()
+        logger.info(f"Successfully set commands for chat {chat_id}")
     except Exception as e:
-        print(f"Error setting commands: {str(e)}")
+        logger.error(f"Error setting commands: {str(e)}")
