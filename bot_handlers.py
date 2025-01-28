@@ -1,7 +1,6 @@
 import os
-import re
 import time
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 import requests
 from loguru import logger
 
@@ -17,7 +16,7 @@ from services.request_tracker import RequestTracker
 from services.bot.provider import send_message_to_provider, parse_provider_mention
 from utils.telegram_utils import send_message
 
-BOT_MENTION_PATTERN = r'@group_code_bot\s+(.*)'
+
 GITHUB_ISSUE_PATTERN = r'(?:https?://)?github\.com/([^/]+)/([^/]+)/issues/(\d+)'
 
 
@@ -203,10 +202,7 @@ async def handle_message(message: Dict[str, Any]) -> None:
         return
     
 
-def parse_bot_mention(text: str) -> Optional[str]:
-    """Extract command text from bot mention"""
-    match = re.search(BOT_MENTION_PATTERN, text)
-    return match.group(1) if match else None
+
 
 
 async def handle_command(message: Dict[str, Any], command: str) -> bool:

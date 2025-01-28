@@ -34,16 +34,6 @@ class CommandMessage(BaseMessage):
     command: str = Field(..., regex=r'^/[a-zA-Z0-9_]+$')
     args: str = ''
 
-class CodeRequest(BaseMessage):
-    """Code request message model."""
-    request_text: str = Field(..., min_length=1)
-
-class ProviderMessage(BaseMessage):
-    """Provider message model."""
-    provider_id: str
-    instance_id: str
-    content: str
-
 class GitHubIssue(BaseMessage):
     """GitHub issue message model."""
     owner: str
