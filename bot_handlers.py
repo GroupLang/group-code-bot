@@ -178,6 +178,13 @@ async def handle_message(message: Dict[str, Any]) -> None:
         
     text = message['text']
     
+    # Handle commands first
+    if text.startswith('/'):
+        # Extract the command by removing the @ portion if present
+        command = text.split('@')[0].split()[0][1:]  # This will convert "/help@group_code_bot" to "help"
+        await handle_command(message, command)
+        return
+    
     # Handle replies to provider messages
     if 'reply_to_message' in message:
         if await handle_provider_reply(message, message['reply_to_message']):
@@ -188,15 +195,12 @@ async def handle_message(message: Dict[str, Any]) -> None:
         return
 
     # Handle non-command messages
-    if not text.startswith('/'):
-        if 'github.com' in text.lower():
-            await handle_github_issue_link(message)
-            return
-        elif '@group_write_bot' in text.lower():
-            await handle_code_request(message)
-            return
-    
-    await handle_command(message)
+    if 'github.com' in text.lower():
+        await handle_github_issue_link(message)
+        return
+    elif '@group_write_bot' in text.lower():
+        await handle_code_request(message)
+        return
     
 
 def parse_bot_mention(text: str) -> Optional[str]:
