@@ -45,10 +45,6 @@ class GitHubError(BaseError):
     """Raised when there's an error in GitHub API interactions."""
     pass
 
-class DatabaseError(BaseError):
-    """Raised when there's an error in database operations."""
-    pass
-
 class ValidationError(BaseError):
     """Raised when there's an error in data validation."""
     pass
@@ -197,20 +193,4 @@ def error_context(
             **kwargs
         )
 
-def is_retryable_error(error: Exception) -> bool:
-    """Determine if an error should trigger a retry.
-    
-    Args:
-        error: The exception to check
-        
-    Returns:
-        bool: Whether the error is retryable
-    """
-    # Add specific error types that should trigger retries
-    retryable_errors = (
-        TelegramError,
-        GitHubError,
-        DatabaseError
-    )
-    
-    return isinstance(error, retryable_errors)
+
