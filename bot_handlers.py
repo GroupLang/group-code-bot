@@ -92,10 +92,14 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
                 logger.error(f"Error adding repository: {e}")
                 return 
 
-            time.sleep(10)
+            time.sleep(61)
 
-            # Retrieve the issue and get the instance_id
-            issues = await client.get_repository_issues(repo_url=issue_url)
+            try:
+                issues = await client.get_repository_issues(repo_url=issue_url)
+            except Exception as e:
+                repo_url = repo_url.replace(owner, 'agentmarketproxy') 
+                issue_url = f"{repo_url}/issues/{issue_number}"
+                issues = await client.get_repository_issues(repo_url=issue_url)
             issue = next((issue for issue in issues if issue['issue_number'] == issue_number), None)
 
             if not issue or not issue.get('instance_id'):
