@@ -67,6 +67,18 @@ async def handle_code_request(message: Dict[str, Any]) -> None:
         f"🔍 Instance ID: `{instance_id}`\n"
     )
 
+def format_issue_message(issue: Dict[str, Any], instance_id: str, issue_number: int) -> str:
+    """Format the issue details into a Telegram message."""
+    message = (
+        f"✅ Created instance `{instance_id}` from GitHub issue #{issue_number}\n\n"
+        f"*Title:* {issue['title']}\n"
+    )
+    if issue.get('body'):
+        message += f"*Description:* {issue['body']}\n"
+    if issue.get('reward_amount'):
+        message += f"*Reward:* ${issue['reward_amount']:.2f}\n"
+    return message
+
 async def handle_github_issue_link(message: Dict[str, Any]) -> None:
     """Handle GitHub issue link detection using authorized endpoints."""
     chat_id = message['chat']['id']
@@ -80,39 +92,49 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
     
     async with AgentMarketClient() as client:
         try:
-            # Include 'issue_url' in repo_data instead of 'issue_number'
             issue_url = f"{repo_url}/issues/{issue_number}"
             repo_data = {
                 "repo_url": issue_url,
                 "default_reward": 0.03,
             }
+
+            # First try to get existing issue
             try:
-                try:
-                    issues = await client.get_repository_issues(repo_url=issue_url)
-                    return
-                except Exception as e:
-                    repo_url = repo_url.replace(owner, 'agentmarketproxy') 
-                    issue_url = f"{repo_url}/issues/{issue_number}"
-                    issues = await client.get_repository_issues(repo_url=issue_url)
-                    return
-            except Exception as e:
-                pass
+                issues = await client.get_repository_issues(repo_url=issue_url)
+            except Exception:
+                # Try with proxy if direct access fails
+                repo_url = repo_url.replace(owner, 'agentmarketproxy')
+                issue_url = f"{repo_url}/issues/{issue_number}"
+                issues = await client.get_repository_issues(repo_url=issue_url)
+
+            issue = next((issue for issue in issues if issue['issue_number'] == issue_number), None)
+            if issue and issue.get('instance_id'):
+                instance_id = issue['instance_id']
+                tracker = RequestTracker()
+                await tracker.add_request(instance_id, chat_id)
+                message = format_issue_message(issue, instance_id, issue_number)
+                send_message(chat_id, message)
+                return
+
+            # If issue not found or no instance, try adding repository
             try:
                 await client.add_repository(repo_data)
             except Exception as e:
                 logger.error(f"Error adding repository: {e}")
-                return 
+                return
 
+            # Wait for repository to be processed
             time.sleep(61)
 
+            # Try getting the issue again
             try:
                 issues = await client.get_repository_issues(repo_url=issue_url)
-            except Exception as e:
-                repo_url = repo_url.replace(owner, 'agentmarketproxy') 
+            except Exception:
+                repo_url = repo_url.replace(owner, 'agentmarketproxy')
                 issue_url = f"{repo_url}/issues/{issue_number}"
                 issues = await client.get_repository_issues(repo_url=issue_url)
-            issue = next((issue for issue in issues if issue['issue_number'] == issue_number), None)
 
+            issue = next((issue for issue in issues if issue['issue_number'] == issue_number), None)
             if not issue or not issue.get('instance_id'):
                 send_message(
                     chat_id,
@@ -121,17 +143,11 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
                 return
 
             instance_id = issue['instance_id']
-            
-            # Store the instance
             tracker = RequestTracker()
             await tracker.add_request(instance_id, chat_id)
+            message = format_issue_message(issue, instance_id, issue_number)
+            send_message(chat_id, message)
 
-            # Send confirmation message
-            send_message(
-                chat_id,
-                f"✅ Created instance `{instance_id}` from GitHub issue #{issue_number}:\n"
-                f"*{issue['title']}*\n\n"
-            )
         except Exception as e:
             logger.error(f"Error handling GitHub issue: {e}")
             send_message(
