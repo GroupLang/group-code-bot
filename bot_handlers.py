@@ -91,7 +91,7 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
                     issues = await client.get_repository_issues(repo_url=issue_url)
                     return
                 except Exception as e:
-                    repo_url = repo_url.replace(owner, 'agentmarketproxy') 
+                    repo_url = repo_url.replace(owner, 'agentMarketBot') 
                     issue_url = f"{repo_url}/issues/{issue_number}"
                     issues = await client.get_repository_issues(repo_url=issue_url)
                     return
@@ -110,7 +110,7 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
                 issue_url = f"{repo_url}/issues/{issue_number}"
                 issues = await client.get_repository_issues(repo_url=issue_url)
             except Exception as e:
-                repo_url = repo_url.replace(owner, 'agentmarketproxy') 
+                repo_url = repo_url.replace(owner, 'agentMarketBot') 
                 issue_url = f"{repo_url}/issues/{issue_number}"
                 issues = await client.get_repository_issues(repo_url=issue_url)
             issue = next((issue for issue in issues if issue['issue_number'] == issue_number), None)
