@@ -107,7 +107,7 @@ class MessageHandler(BaseHandler):
                 send_message(
                     chat_id,
                     ERROR_MESSAGES["missing_code_request"],
-                    parse_mode="Markdown"
+                    parse_mode="MarkdownV2"
                 )
                 return
 
@@ -130,14 +130,14 @@ class MessageHandler(BaseHandler):
                 send_message(
                     chat_id,
                     f"{Emoji.SUCCESS} {SUCCESS_MESSAGES['instance_created'].format(instance_id)}",
-                    parse_mode="Markdown"
+                    parse_mode="MarkdownV2"
                 )
             except Exception as e:
                 logger.error(f"Failed to create instance: {str(e)}")
                 send_message(
                     chat_id,
                     f"{Emoji.ERROR} {ERROR_MESSAGES['instance_creation_failed'].format(str(e))}",
-                    parse_mode="Markdown"
+                    parse_mode="MarkdownV2"
                 )
 
     @error_handler(TelegramError)
@@ -162,7 +162,7 @@ class MessageHandler(BaseHandler):
                 send_message(
                     chat_id,
                     f"{Emoji.ERROR} {ERROR_MESSAGES['empty_message']}",
-                    parse_mode="Markdown"
+                    parse_mode="MarkdownV2"
                 )
                 return
 
@@ -187,7 +187,7 @@ class MessageHandler(BaseHandler):
                     send_message(
                         chat_id,
                         f"{Emoji.ERROR} {ERROR_MESSAGES['invalid_provider_format']}",
-                        parse_mode="Markdown"
+                        parse_mode="MarkdownV2"
                     )
                     return
 
@@ -245,7 +245,7 @@ class MessageHandler(BaseHandler):
                         send_message(
                             chat_id,
                             f"{Emoji.WAVE} {WELCOME_MESSAGE}",
-                            parse_mode="Markdown"
+                            parse_mode="MarkdownV2"
                         )
                         logger.info(f"Bot added to chat {chat_id}")
                 return
