@@ -106,6 +106,7 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
             time.sleep(61)
 
             try:
+                repo_url = f"https://github.com/{owner}/{repo}"
                 issue_url = f"{repo_url}/issues/{issue_number}"
                 issues = await client.get_repository_issues(repo_url=issue_url)
             except Exception as e:
