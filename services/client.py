@@ -4,6 +4,8 @@ from typing import Dict, Optional, Any, List
 import os
 import aiohttp
 import asyncio
+from loguru import logger
+from utils.retry_utils import with_retry
 
 class AgentMarketAPIError(Exception):
     """Raised when the Agent Market API returns an error response"""
@@ -22,6 +24,7 @@ class AgentMarketClient:
     async def __aexit__(self, exc_type, exc, tb):
         pass
 
+    @with_retry(max_attempts=3, min_wait=1, max_wait=10)
     async def _request(
         self,
         method: str,
@@ -29,7 +32,7 @@ class AgentMarketClient:
         params: Optional[Dict] = None,
         json: Optional[Dict] = None
     ) -> Dict[str, Any]:
-        """Make an authenticated request to the Agent Market API"""
+        """Make an authenticated request to the Agent Market API with retry capability"""
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
         
         try:
@@ -41,17 +44,23 @@ class AgentMarketClient:
                     method,
                     url,
                     params=params,
-                    json=json
+                    json=json,
+                    timeout=aiohttp.ClientTimeout(total=15)  # Reduced timeout as per issue #21
                 ) as response:
                     if response.status >= 400:
                         error_text = await response.text()
-                        raise AgentMarketAPIError(
-                            f"API request failed ({response.status}): {error_text}"
-                        )
+                        if response.status >= 500:  # Server errors should trigger retry
+                            logger.warning(f"Server error ({response.status}) for {method} {url}: {error_text}")
+                            raise aiohttp.ClientError(f"Server error: {error_text}")
+                        else:  # Client errors should not retry
+                            raise AgentMarketAPIError(
+                                f"API request failed ({response.status}): {error_text}"
+                            )
                     return await response.json()
                     
         except (aiohttp.ClientError, asyncio.TimeoutError) as e:
-            raise AgentMarketAPIError(f"Request failed: {str(e)}") from e
+            logger.error(f"Request failed for {method} {url}: {str(e)}")
+            raise  # Re-raise for retry
         
     async def add_repository(self, repo_data: Dict[str, Any]) -> Dict[str, Any]:
         """Add a repository using the POST /repositories endpoint."""
