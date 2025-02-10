@@ -45,7 +45,7 @@ class AgentMarketClient:
                     url,
                     params=params,
                     json=json,
-                    timeout=aiohttp.ClientTimeout(total=30)  # Set timeout
+                    timeout=aiohttp.ClientTimeout(total=15)  # Reduced timeout as per issue #21
                 ) as response:
                     if response.status >= 400:
                         error_text = await response.text()
