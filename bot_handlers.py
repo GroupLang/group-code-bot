@@ -128,11 +128,24 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
             tracker = RequestTracker()
             await tracker.add_request(instance_id, chat_id)
 
-            # Send confirmation message
+            # Send confirmation message with issue details
+            issue_body = issue.get('body', 'No description provided.')
+            reward = issue.get('reward_amount', 0.0)
+            
+            message = (
+                f"✅ Created instance `{instance_id}` from GitHub issue #{issue_number}\n\n"
+                f"*Title:* {issue['title']}\n"
+                f"*Reward:* ${reward:.2f}\n\n"
+                f"*Description:*\n{issue_body}"
+            )
+            
+            # Telegram has a 4096 character limit for messages
+            if len(message) > 4000:
+                message = message[:3997] + "..."
+                
             send_message(
                 chat_id,
-                f"✅ Created instance `{instance_id}` from GitHub issue #{issue_number}:\n"
-                f"*{issue['title']}*\n\n"
+                message
             )
         except Exception as e:
             logger.error(f"Error handling GitHub issue: {e}")
