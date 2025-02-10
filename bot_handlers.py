@@ -128,11 +128,19 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
             tracker = RequestTracker()
             await tracker.add_request(instance_id, chat_id)
 
-            # Send confirmation message
+            # Send confirmation message with full issue details
+            issue_body = issue.get('body', 'No description provided.')
+            # Escape special markdown characters in title and body
+            safe_title = issue['title'].replace('*', '\\*').replace('_', '\\_').replace('`', '\\`')
+            safe_body = issue_body.replace('*', '\\*').replace('_', '\\_').replace('`', '\\`')
+            message_text = (
+                f"✅ Created instance `{instance_id}` from GitHub issue #{issue_number}\n\n"
+                f"*Title:* {safe_title}\n"
+                f"*Description:*\n{safe_body}\n"
+            )
             send_message(
                 chat_id,
-                f"✅ Created instance `{instance_id}` from GitHub issue #{issue_number}:\n"
-                f"*{issue['title']}*\n\n"
+                message_text
             )
         except Exception as e:
             logger.error(f"Error handling GitHub issue: {e}")
