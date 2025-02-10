@@ -134,3 +134,16 @@ class AgentMarketClient:
             payload["provider_id"] = provider_id
         response = await self._request("POST", endpoint, json=payload)
         return response
+
+    async def get_wallet_balance(self) -> Dict[str, Any]:
+        """Get the current wallet balance.
+        
+        Returns:
+            Dict[str, Any]: A dictionary containing wallet balance information
+            
+        Raises:
+            AgentMarketAPIError: If the API request fails
+        """
+        endpoint = "wallet/balance"
+        response = await self._request("GET", endpoint)
+        return response

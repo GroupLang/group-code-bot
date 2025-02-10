@@ -144,10 +144,32 @@ async def command_submit_reward(chat_id: int, args: str) -> None:
     )
     send_message(chat_id, success_msg)
 
+async def command_balance(chat_id: int, args: str = '') -> None:
+    """Handle /balance command.
+    
+    Retrieves and displays the current wallet balance.
+    
+    Args:
+        chat_id: Telegram chat ID
+        args: Command arguments (unused)
+    """
+    try:
+        async with AgentMarketClient() as client:
+            balance_info = await client.get_wallet_balance()
+            success_msg = SUCCESS_MESSAGES["wallet_balance"].format(
+                balance=balance_info.get('balance', 0),
+                status=balance_info.get('status', 'Active')
+            )
+            send_message(chat_id, success_msg)
+    except AgentMarketAPIError as e:
+        error_msg = f"{Emoji.ERROR} Failed to retrieve wallet balance: {str(e)}"
+        send_message(chat_id, error_msg)
+
 # Command router mapping
 COMMAND_HANDLERS = {
     '/help': command_help,
-    '/submit_reward': command_submit_reward
+    '/submit_reward': command_submit_reward,
+    '/balance': command_balance
 }
 
 @error_handler(CommandParseError)

@@ -89,6 +89,11 @@ COMMAND_MESSAGES: Dict[str, MessageTemplate] = {
 
 # Command usage templates with validation
 COMMAND_USAGE = {
+    "balance": CommandUsage(
+        command="/balance",
+        usage="/balance",
+        description="Check your wallet balance"
+    ),
     "submit_reward": CommandUsage(
         command="/submit_reward",
         usage="/submit_reward <instance_id> <amount>",
@@ -234,6 +239,17 @@ ERROR_MESSAGES: Dict[str, MessageTemplate] = {
 
 # Success messages with validation
 SUCCESS_MESSAGES: Dict[str, MessageTemplate] = {
+    # Wallet related
+    "wallet_balance": MessageTemplate(
+        template=(
+            f"{Emoji.INFO} *Wallet Balance*\n"
+            "Balance: {{balance}} credits\n"
+            "Status: {{status}}"
+        ),
+        category=MessageCategory.SUCCESS,
+        placeholders=["balance", "status"]
+    ),
+    
     # Instance related
     "instance_created": MessageTemplate(
         template=(
@@ -326,6 +342,7 @@ WELCOME_MESSAGE = (
 HELP_MESSAGE = (
     "*Group Code Bot Help*\n\n"
     "*Commands:*\n"
+    "• /balance - Check your wallet balance\n"
     "• /clear - Clear chat history and unresolved requests\n"
     "• /help - Show this help message\n"
     "• /submit\\_reward <instance\\_id> <amount> - Submit reward for an instance\n\n"
