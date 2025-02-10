@@ -130,17 +130,28 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
 
             # Send confirmation message with full issue details
             issue_body = issue.get('body', 'No description provided.')
-            # Escape special markdown characters in title and body
-            safe_title = issue['title'].replace('*', '\\*').replace('_', '\\_').replace('`', '\\`')
-            safe_body = issue_body.replace('*', '\\*').replace('_', '\\_').replace('`', '\\`')
+            # Escape special markdown characters in title and body for Telegram MarkdownV2
+            def escape_markdown(text):
+                # Characters that need escaping in MarkdownV2: _ * [ ] ( ) ~ ` > # + - = | { } . !
+                special_chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']
+                escaped_text = text
+                for char in special_chars:
+                    escaped_text = escaped_text.replace(char, f'\\{char}')
+                return escaped_text
+                
+            safe_title = escape_markdown(issue['title'])
+            safe_body = escape_markdown(issue_body)
+            # Escape special characters in the entire message
+            check_mark = "✅"  # Emojis don't need escaping
             message_text = (
-                f"✅ Created instance `{instance_id}` from GitHub issue #{issue_number}\n\n"
+                f"{check_mark} Created instance `{escape_markdown(instance_id)}` from GitHub issue \\#{issue_number}\n\n"
                 f"*Title:* {safe_title}\n"
                 f"*Description:*\n{safe_body}\n"
             )
             send_message(
                 chat_id,
-                message_text
+                message_text,
+                parse_mode='MarkdownV2'
             )
         except Exception as e:
             logger.error(f"Error handling GitHub issue: {e}")
