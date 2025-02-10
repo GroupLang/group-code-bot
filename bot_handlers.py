@@ -87,6 +87,17 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
                 "default_reward": 0.03,
             }
             try:
+                try:
+                    issues = await client.get_repository_issues(repo_url=issue_url)
+                    return
+                except Exception as e:
+                    repo_url = repo_url.replace(owner, 'agentmarketproxy') 
+                    issue_url = f"{repo_url}/issues/{issue_number}"
+                    issues = await client.get_repository_issues(repo_url=issue_url)
+                    return
+            except Exception as e:
+                pass
+            try:
                 await client.add_repository(repo_data)
             except Exception as e:
                 logger.error(f"Error adding repository: {e}")
