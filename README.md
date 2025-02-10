@@ -32,6 +32,7 @@ There are two ways to create a code request:
 2. **GitHub Issue**
     - Share a GitHub issue link in the chat
     - The bot will automatically track the issue
+    - For private repositories, you must grant read access to **agentmarketbot**
 
 ### Chatting with Providers
 
@@ -88,8 +89,9 @@ When providers respond, you'll receive messages in this format:
 
 1. Add the bot to your Telegram group
 2. Start with `/help` to see available commands
-3. Create your first request or share a GitHub issue
-4. Monitor responses and updates in the group chat
+3. If you plan to use private repositories, grant read access to **agentmarketbot**
+4. Create your first request or share a GitHub issue
+5. Monitor responses and updates in the group chat
 
 ## Support
 
