@@ -12,10 +12,10 @@ def escape_markdown(text: str) -> str:
     return re.sub(special_chars, r'\\\g<0>', text)
 
 def send_message(chat_id: int, text: str, reply_markup: Optional[Dict] = None, 
-                reply_to_message_id: Optional[int] = None, parse_mode: Optional[str] = 'Markdown') -> Dict[str, Any]:
+                reply_to_message_id: Optional[int] = None, parse_mode: Optional[str] = 'MarkdownV2') -> Dict[str, Any]:
     url = f"https://api.telegram.org/bot{os.environ['GROUPWRITE_TELEGRAM_BOT_TOKEN']}/sendMessage"
     
-    escaped_text = escape_markdown(text) if parse_mode == 'Markdown' else text
+    escaped_text = escape_markdown(text) if parse_mode == 'MarkdownV2' else text
     data = {
         'chat_id': chat_id,
         'text': escaped_text,
@@ -40,7 +40,7 @@ def edit_message(chat_id: int, message_id: int, text: str,
         'chat_id': chat_id,
         'message_id': message_id,
         'text': escaped_text,
-        'parse_mode': 'Markdown'
+        'parse_mode': 'MarkdownV2'
     }
     
     if reply_markup:

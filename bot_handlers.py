@@ -15,7 +15,7 @@ from services.bot.messages import (
 from services.client import AgentMarketClient
 from services.request_tracker import RequestTracker
 from services.bot.provider import send_message_to_provider, parse_provider_mention
-from utils.telegram_utils import send_message
+from utils.telegram_utils import send_message, escape_markdown
 
 BOT_MENTION_PATTERN = r'@group_code_bot\s+(.*)'
 GITHUB_ISSUE_PATTERN = r'(?:https?://)?github\.com/([^/]+)/([^/]+)/issues/(\d+)'
@@ -131,20 +131,12 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
             # Send confirmation message with full issue details
             issue_body = issue.get('body', 'No description provided.')
             # Escape special markdown characters in title and body for Telegram MarkdownV2
-            def escape_markdown(text):
-                # Characters that need escaping in MarkdownV2: _ * [ ] ( ) ~ ` > # + - = | { } . !
-                special_chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']
-                escaped_text = text
-                for char in special_chars:
-                    escaped_text = escaped_text.replace(char, f'\\{char}')
-                return escaped_text
-                
             safe_title = escape_markdown(issue['title'])
             safe_body = escape_markdown(issue_body)
             # Escape special characters in the entire message
             check_mark = "✅"  # Emojis don't need escaping
             message_text = (
-                f"{check_mark} Created instance `{escape_markdown(instance_id)}` from GitHub issue \\#{issue_number}\n\n"
+                f"{check_mark} Created instance `{escape_markdown(instance_id)}` from GitHub issue #{escape_markdown(str(issue_number))}\n\n"
                 f"*Title:* {safe_title}\n"
                 f"*Description:*\n{safe_body}\n"
             )
