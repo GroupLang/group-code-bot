@@ -128,13 +128,11 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
             await tracker.add_request(instance_id, chat_id)
 
             issue_body = issue.get('body', 'No description provided.')
-            safe_title = escape_markdown(issue['title'])
-            safe_body = escape_markdown(issue_body)
             check_mark = "✅"
             message_text = (
-                f"{check_mark} Created instance `{escape_markdown(instance_id)}` from GitHub issue {escape_markdown(str(issue_number))}\n\n"
-                f"*Title:* {safe_title}\n"
-                f"*Description:*\n{safe_body}\n"
+                f"{check_mark} Created instance `{instance_id}` from GitHub issue {issue_number}\n\n"
+                f"*Title:* {issue['title']}\n"
+                f"*Description:*\n{issue_body}\n"
             )
             send_message(
                 chat_id,
