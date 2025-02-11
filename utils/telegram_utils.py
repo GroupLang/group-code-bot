@@ -5,11 +5,23 @@ from typing import Dict, Any, Optional, Tuple
 
 def escape_markdown(text: str) -> str:
     """
-    Escape Markdown special characters in text for Telegram messages.
-    Handles: _ * ` [ ] ( ) ~ > # + - = | { } . !
+    Escape Telegram MarkdownV2 special characters in text outside of code blocks.
+    Special characters that need to be escaped: _ * [ ] ( ) ~ ` > # + - = | { } . !
+    This function escapes all required reserved characters (including '#' so that headers render correctly)
+    but leaves markdown formatting markers like asterisks (*) and underscores (_) unchanged.
+    Additionally, text within triple-backtick code blocks (e.g. ```markdown ... ```) is not escaped.
     """
-    special_chars = r'[_*\[\]()~`>#+-=|{}.!]'
-    return re.sub(special_chars, r'\\\g<0>', text)
+    parts = re.split(r'(```[\s\S]*?```)', text)
+    
+    pattern = r'(?<!\\)([#\[\]()~`>+\=|{}.!-])'
+    
+    for i, part in enumerate(parts):
+        if part.startswith("```"):
+            if len(part) > 3 and part[3] == "\n":
+                parts[i] = "```markdown" + part[3:]
+        else:
+            parts[i] = re.sub(pattern, r'\\\1', part)
+    return "".join(parts)
 
 def send_message(chat_id: int, text: str, reply_markup: Optional[Dict] = None, 
                 reply_to_message_id: Optional[int] = None, parse_mode: Optional[str] = 'MarkdownV2') -> Dict[str, Any]:
