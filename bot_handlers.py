@@ -37,7 +37,7 @@ async def handle_update(update: Dict[str, Any]) -> None:
 async def handle_code_request(message: Dict[str, Any]) -> None:
     """Handle code request commands"""
     chat_id = message['chat']['id']
-    command_text = message['text'].lower().split('@group_write_bot', 1)[1].strip()
+    command_text = message['text'].lower().split('@group_code_bot', 1)[1].strip()
     
     if not command_text:
         send_message(
@@ -220,7 +220,7 @@ async def handle_message(message: Dict[str, Any]) -> None:
     if 'github.com' in text.lower():
         await handle_github_issue_link(message)
         return
-    elif '@group_write_bot' in text.lower():
+    elif '@group_code_bot' in text.lower():
         await handle_code_request(message)
         return
     
