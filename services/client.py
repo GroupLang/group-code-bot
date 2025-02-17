@@ -65,12 +65,13 @@ class AgentMarketClient:
     async def add_repository(self, repo_data: Dict[str, Any]) -> Dict[str, Any]:
         """Add a repository using the POST /repositories endpoint."""
         endpoint = "github/repositories"
-        # Extract repo_url and default_reward from repo_data
-        params = {
+        body = {
             "repo_url": repo_data.get("repo_url"),
-            "default_reward": repo_data.get("default_reward", 0.03)  # Default value if not provided
+            "default_reward": repo_data.get("default_reward", 0.03),
+            "representative_agent": repo_data.get("representative_agent", False),
         }
-        response = await self._request("POST", endpoint, params=params)
+        body = {k: v for k, v in body.items() if v is not None}
+        response = await self._request("POST", endpoint, json=body)
         return response
 
     async def create_instance(self, instance_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -145,5 +146,3 @@ class AgentMarketClient:
             AgentMarketAPIError: If the API request fails
         """
         endpoint = "wallet/balance"
-        response = await self._request("GET", endpoint)
-        return response
