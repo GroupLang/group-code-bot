@@ -101,6 +101,10 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
                 await client.add_repository(repo_data)
             except Exception as e:
                 logger.error(f"Error adding repository: {e}")
+                send_message(
+                    chat_id,
+                    f"❌ Failed to process GitHub issue {e}. Please try again later.",
+                )
                 return 
 
             time.sleep(61)
