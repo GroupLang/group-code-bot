@@ -48,7 +48,7 @@ async def handle_code_request(message: Dict[str, Any]) -> None:
 
     instance_data = {
         "background": command_text,
-        "max_credit_per_instance": 0.03,
+        "max_credit_per_instance": 0.04,
         "instance_timeout": 30,
         "gen_reward_timeout": 6000,
         "percentage_reward": 1,
@@ -84,7 +84,7 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
             issue_url = f"{repo_url}/issues/{issue_number}"
             repo_data = {
                 "repo_url": issue_url,
-                "default_reward": 0.03,
+                "default_reward": 0.04,
             }
             try:
                 try:

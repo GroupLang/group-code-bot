@@ -67,7 +67,7 @@ class AgentMarketClient:
         endpoint = "github/repositories"
         body = {
             "repo_url": repo_data.get("repo_url"),
-            "default_reward": repo_data.get("default_reward", 0.03),
+            "default_reward": repo_data.get("default_reward", 0.04),
             "representative_agent": repo_data.get("representative_agent", False),
         }
         body = {k: v for k, v in body.items() if v is not None}

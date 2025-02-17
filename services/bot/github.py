@@ -34,7 +34,7 @@ async def handle_github_issue(chat_id: int, owner: str, repo: str, issue_num: st
             # Add repository
             repo_data = {
                 "repo_url": issue_url,
-                "default_reward": 0.03,
+                "default_reward": 0.04,
             }
             await client.add_repository(repo_data)
 
