@@ -93,11 +93,20 @@ async def handle_code_request(message: Dict[str, Any]) -> None:
     tracker = RequestTracker()
     await tracker.add_request(instance_id, chat_id)
         
-    send_message(
-        chat_id,
-        f"✅ Instance created!\n\n"
-        f"🔍 Instance ID: `{instance_id}`\n"
-    )
+    try:
+        # First try with simple formatting
+        send_message(
+            chat_id,
+            f"✅ Instance created!\n\n"
+            f"🔍 Instance ID: {instance_id}\n"
+        )
+    except Exception as e:
+        logger.error(f"Failed to send instance creation message: {e}")
+        # Fallback to even simpler message if needed
+        send_message(
+            chat_id,
+            f"✅ Instance created with ID: {instance_id}"
+        )
 
 async def handle_github_issue_link(message: Dict[str, Any]) -> None:
     """Handle GitHub issue link detection using authorized endpoints."""
@@ -163,18 +172,29 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
             tracker = RequestTracker()
             await tracker.add_request(instance_id, chat_id)
 
-            issue_body = issue.get('body', 'No description provided.')
-            check_mark = "✅"
-            message_text = (
-                f"{check_mark} Created instance `{instance_id}` from GitHub issue {issue_number}\n\n"
-                f"*Title:* {issue['title']}\n"
-                f"*Description:*\n{issue_body}\n"
-            )
-            send_message(
-                chat_id,
-                message_text,
-                parse_mode='MarkdownV2'
-            )
+            try:
+                issue_body = issue.get('body', 'No description provided.')
+                check_mark = "✅"
+                # Try first with MarkdownV2 formatting
+                message_text = (
+                    f"{check_mark} Created instance `{instance_id}` from GitHub issue {issue_number}\n\n"
+                    f"*Title:* {issue['title']}\n"
+                    f"*Description:*\n{issue_body}\n"
+                )
+                send_message(
+                    chat_id,
+                    message_text,
+                    parse_mode='MarkdownV2'
+                )
+            except Exception as e:
+                logger.error(f"Failed to send formatted GitHub issue message: {e}")
+                # Fallback to plain text with no markdown
+                plain_message = (
+                    f"✅ Created instance {instance_id} from GitHub issue {issue_number}\n\n"
+                    f"Title: {issue['title']}\n"
+                    f"Description:\n{issue_body}\n"
+                )
+                send_message(chat_id, plain_message)
         except Exception as e:
             import traceback
             error_details = f"Error handling GitHub issue: {e}\n"
@@ -204,7 +224,17 @@ async def handle_new_chat_members(message: Dict[str, Any]) -> None:
                 set_bot_commands(chat_id)
                 # Add small delay before sending welcome message to ensure bot is fully initialized in the chat
                 await asyncio.sleep(1)
-                send_message(chat_id, WELCOME_MESSAGE, parse_mode='MarkdownV2')
+                
+                # First try with no formatting to ensure the message gets delivered
+                try:
+                    # Remove markdown formatting symbols from welcome message
+                    plain_welcome = WELCOME_MESSAGE.replace('*', '').replace('`', '')
+                    send_message(chat_id, plain_welcome)
+                except Exception as e:
+                    logger.error(f"Failed to send plain welcome message to chat {chat_id}: {e}")
+                    # Fallback to even simpler message if plain message fails
+                    simple_message = "👋 Welcome to Group Code Bot! Type /help to see available commands."
+                    send_message(chat_id, simple_message)
             except Exception as e:
                 logger.error(f"Failed to send welcome message to chat {chat_id}: {e}")
                 # We'll log but not re-raise the error to prevent the function from failing completely
@@ -300,7 +330,15 @@ async def handle_command(message: Dict[str, Any], command: str) -> bool:
     chat_id = message['chat']['id']
     
     if command.startswith('/help'):
-        send_message(chat_id, HELP_MESSAGE)
+        try:
+            # Try to send plain message without formatting
+            plain_help = HELP_MESSAGE.replace('*', '').replace('`', '')
+            send_message(chat_id, plain_help)
+        except Exception as e:
+            logger.error(f"Failed to send help message to chat {chat_id}: {e}")
+            # Fallback to much simpler help message
+            simple_help = "Available commands:\n/help - Show this message\n/clear - Clear chat history\n/submit_reward - Submit reward for completed task"
+            send_message(chat_id, simple_help)
         return True
         
     if command.startswith('/submit_reward'):
@@ -309,7 +347,13 @@ async def handle_command(message: Dict[str, Any], command: str) -> bool:
         
     if command.startswith('/clear'):
         await clear_chat_history(chat_id)
-        send_message(chat_id, SUCCESS_MESSAGES["history_cleared"].template)
+        try:
+            # Try with the template from success messages
+            send_message(chat_id, SUCCESS_MESSAGES["history_cleared"].template)
+        except Exception as e:
+            logger.error(f"Failed to send clear history confirmation message: {e}")
+            # Fallback to simpler message
+            send_message(chat_id, "✅ Chat history cleared successfully!")
         return True
         
     return False
@@ -328,7 +372,14 @@ async def handle_submit_reward(message: Dict[str, Any]) -> None:
         amount = float(parts[2].replace(',', '.'))
         async with AgentMarketClient() as client:
             await client.report_reward(instance_id, amount)
-        send_message(chat_id, REWARD_SUCCESS.format(amount=amount, instance_id=instance_id))
+        
+        try:
+            # Try to send formatted success message
+            send_message(chat_id, REWARD_SUCCESS.format(amount=amount, instance_id=instance_id))
+        except Exception as e:
+            logger.error(f"Failed to send reward success message: {e}")
+            # Fallback to simpler message
+            send_message(chat_id, f"✅ Successfully submitted reward of {amount} for instance {instance_id}")
     except ValueError:
         send_message(chat_id, "❌ Amount must be a valid number")
     except Exception as e:
