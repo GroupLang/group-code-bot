@@ -25,7 +25,7 @@ async def get_chat_history(chat_id: int, limit: int = 100) -> List[Dict[str, Any
             
         # Get messages from DynamoDB
         response = Config._table.get_item(
-            Key={'chat_id': chat_id_str}
+            Key={'id': chat_id_str}
         )
         
         # Get messages array from item, default to empty list if not found
@@ -70,7 +70,7 @@ def store_message(chat_id: int, message: Dict[str, Any]) -> None:
         
         # Get existing messages
         response = Config._table.get_item(
-            Key={'chat_id': chat_id_str}
+            Key={'id': chat_id_str}
         )
         
         # Initialize messages list, either from existing item or as empty list
@@ -80,7 +80,7 @@ def store_message(chat_id: int, message: Dict[str, Any]) -> None:
             # Create new item if it doesn't exist
             Config._table.put_item(
                 Item={
-                    'chat_id': chat_id_str,
+                    'id': chat_id_str,
                     'messages': [message_with_user],
                     'reactions': {}
                 }
@@ -92,7 +92,7 @@ def store_message(chat_id: int, message: Dict[str, Any]) -> None:
             messages = messages[-100:]  # Keep only last 100 messages
             
             Config._table.update_item(
-                Key={'chat_id': chat_id_str},
+                Key={'id': chat_id_str},
                 UpdateExpression='SET messages = :messages',
                 ExpressionAttributeValues={':messages': messages}
             )
@@ -143,7 +143,7 @@ async def clear_chat_history(chat_id: int) -> None:
             
         # Update the item to have an empty messages array
         Config._table.update_item(
-            Key={'chat_id': chat_id_str},
+            Key={'id': chat_id_str},
             UpdateExpression='SET messages = :empty_list',
             ExpressionAttributeValues={':empty_list': []}
         )
