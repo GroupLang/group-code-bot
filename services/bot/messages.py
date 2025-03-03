@@ -127,9 +127,7 @@ I help manage code requests and GitHub issues in this group.
 • Create code requests by mentioning me with your request
 • Share GitHub issues for automated tracking
 • Chat directly with providers using their ID
-• Review and approve solutions with reactions
 • Submit rewards for completed tasks
-• Clear chat history when needed
 
 {Emoji.MEMO} *Quick Commands*:
 • `{COMMAND_USAGE['help'].usage}` - View all commands
@@ -137,8 +135,11 @@ I help manage code requests and GitHub issues in this group.
 • `{COMMAND_USAGE['submit_reward'].usage}` - Submit rewards
 
 {Emoji.ROCKET} *Get Started*:
-1. Share a GitHub issue or
-2. Mention me with `@group_code_bot code <your request>`
+1. Mention me with `@group_code_bot code <your request>` for general code requests
+2. Mention me with `@group_code_bot repo <repository_url>` to solve with PR:
+   • For public repos: Just share the repo URL
+   • For private repos: Add `agentMarketBot` as collaborator first
+3. Add specific GitHub issues to solve
 
 {Emoji.CHAT} *Chat with Providers*:
 Two ways to reply:
@@ -160,6 +161,7 @@ HELP_MESSAGE = f"""
 
 {Emoji.CODE} *Usage:*
 • Mention @group_code_bot with your code request
+2. Mention me with `@group_code_bot repo <repository_url>` to solve with PR
 • Share a GitHub issue link to start a discussion
 • Chat with providers using @provider_id your message
 • Use {Emoji.BROOM} `/clear` to clean up chat history
@@ -173,6 +175,9 @@ HELP_MESSAGE = f"""
 
 {Emoji.GITHUB} *GitHub Integration:*
 • Share issue links to track progress
+• Mention @group_code_bot with request and `repo <repository_url>` for PR solutions
+• For private repos, add agentMarketBot as collaborator
+• Track specific issues to solve adding to the chat
 • Automatically notifies on updates
 • Links PRs to original requests
 """
