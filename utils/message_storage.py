@@ -14,9 +14,18 @@ class Config:
 async def get_chat_history(chat_id: int, limit: int = 100) -> List[Dict[str, Any]]:
     """Fetch recent messages from chat history stored in DynamoDB"""
     try:
+        # Ensure chat_id is properly formatted
+        if not isinstance(chat_id, (int, str)):
+            raise ValueError("chat_id must be an integer or string")
+        
+        # Format chat_id as string, ensuring it's not empty
+        chat_id_str = str(chat_id).strip()
+        if not chat_id_str:
+            raise ValueError("chat_id cannot be empty")
+            
         # Get messages from DynamoDB
         response = Config._table.get_item(
-            Key={'chat_id': str(chat_id)}
+            Key={'chat_id': chat_id_str}
         )
         
         # Get messages array from item, default to empty list if not found
@@ -33,6 +42,15 @@ async def get_chat_history(chat_id: int, limit: int = 100) -> List[Dict[str, Any
 def store_message(chat_id: int, message: Dict[str, Any]) -> None:
     """Store a new message in the chat history"""
     try:
+        # Ensure chat_id is properly formatted
+        if not isinstance(chat_id, (int, str)):
+            raise ValueError("chat_id must be an integer or string")
+        
+        # Format chat_id as string, ensuring it's not empty
+        chat_id_str = str(chat_id).strip()
+        if not chat_id_str:
+            raise ValueError("chat_id cannot be empty")
+            
         # Extract username from message
         username = message.get('from', {}).get('username', 'unknown')
         if username == "unknown" or username == "":
@@ -52,7 +70,7 @@ def store_message(chat_id: int, message: Dict[str, Any]) -> None:
         
         # Get existing messages
         response = Config._table.get_item(
-            Key={'chat_id': str(chat_id)}
+            Key={'chat_id': chat_id_str}
         )
         
         # Initialize messages list, either from existing item or as empty list
@@ -62,7 +80,7 @@ def store_message(chat_id: int, message: Dict[str, Any]) -> None:
             # Create new item if it doesn't exist
             Config._table.put_item(
                 Item={
-                    'chat_id': str(chat_id),
+                    'chat_id': chat_id_str,
                     'messages': [message_with_user],
                     'reactions': {}
                 }
@@ -74,7 +92,7 @@ def store_message(chat_id: int, message: Dict[str, Any]) -> None:
             messages = messages[-100:]  # Keep only last 100 messages
             
             Config._table.update_item(
-                Key={'chat_id': str(chat_id)},
+                Key={'chat_id': chat_id_str},
                 UpdateExpression='SET messages = :messages',
                 ExpressionAttributeValues={':messages': messages}
             )
@@ -114,9 +132,18 @@ def get_from_reaction_to_message(message_reaction: Dict[str, Any]) -> Dict[str, 
 async def clear_chat_history(chat_id: int) -> None:
     """Clear all messages for a specific chat_id from DynamoDB"""
     try:
+        # Ensure chat_id is properly formatted
+        if not isinstance(chat_id, (int, str)):
+            raise ValueError("chat_id must be an integer or string")
+        
+        # Format chat_id as string, ensuring it's not empty
+        chat_id_str = str(chat_id).strip()
+        if not chat_id_str:
+            raise ValueError("chat_id cannot be empty")
+            
         # Update the item to have an empty messages array
         Config._table.update_item(
-            Key={'chat_id': str(chat_id)},
+            Key={'chat_id': chat_id_str},
             UpdateExpression='SET messages = :empty_list',
             ExpressionAttributeValues={':empty_list': []}
         )
