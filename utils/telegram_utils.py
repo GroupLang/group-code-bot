@@ -81,8 +81,18 @@ def send_message(chat_id: int, text: str, reply_markup: Optional[Dict] = None,
         # Log error details
         error_details = f"HTTP Error: {e}\n"
         if hasattr(e, 'response') and e.response is not None:
-            error_details += f"Status Code: {e.response.status_code}\n"
-            error_details += f"Response Content: {e.response.text}\n"
+            # Check if response is an object with status_code or a dict with 'status_code' key
+            if hasattr(e.response, 'status_code'):
+                error_details += f"Status Code: {e.response.status_code}\n"
+            elif isinstance(e.response, dict) and 'status_code' in e.response:
+                error_details += f"Status Code: {e.response['status_code']}\n"
+                
+            # Check for text attribute or key
+            if hasattr(e.response, 'text'):
+                error_details += f"Response Content: {e.response.text}\n"
+            elif isinstance(e.response, dict) and 'text' in e.response:
+                error_details += f"Response Content: {e.response['text']}\n"
+                
             error_details += f"Request Data: {data}\n"
         print(f"Telegram API Error: {error_details}")
         
@@ -131,8 +141,18 @@ def edit_message(chat_id: int, message_id: int, text: str,
         # Get the full error details from the response
         error_details = f"HTTP Error: {e}\n"
         if hasattr(e, 'response') and e.response is not None:
-            error_details += f"Status Code: {e.response.status_code}\n"
-            error_details += f"Response Content: {e.response.text}\n"
+            # Check if response is an object with status_code or a dict with 'status_code' key
+            if hasattr(e.response, 'status_code'):
+                error_details += f"Status Code: {e.response.status_code}\n"
+            elif isinstance(e.response, dict) and 'status_code' in e.response:
+                error_details += f"Status Code: {e.response['status_code']}\n"
+                
+            # Check for text attribute or key
+            if hasattr(e.response, 'text'):
+                error_details += f"Response Content: {e.response.text}\n"
+            elif isinstance(e.response, dict) and 'text' in e.response:
+                error_details += f"Response Content: {e.response['text']}\n"
+                
             error_details += f"Request Data: {data}\n"
         print(f"Telegram API Error: {error_details}")
         

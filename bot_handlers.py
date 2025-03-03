@@ -51,8 +51,17 @@ async def handle_update(update: Dict[str, Any]) -> None:
         
         # Get additional details if it's an HTTP error
         if hasattr(e, 'response') and e.response is not None:
-            error_details += f"Status Code: {e.response.status_code}\n"
-            error_details += f"Response Content: {e.response.text}\n"
+            # Check if response is an object with status_code or a dict with 'status_code' key
+            if hasattr(e.response, 'status_code'):
+                error_details += f"Status Code: {e.response.status_code}\n"
+            elif isinstance(e.response, dict) and 'status_code' in e.response:
+                error_details += f"Status Code: {e.response['status_code']}\n"
+                
+            # Check for text attribute or key
+            if hasattr(e.response, 'text'):
+                error_details += f"Response Content: {e.response.text}\n"
+            elif isinstance(e.response, dict) and 'text' in e.response:
+                error_details += f"Response Content: {e.response['text']}\n"
         
         logger.error(error_details)
 
@@ -202,12 +211,31 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
             
             # Get additional details if it's an HTTP error
             if hasattr(e, 'response') and e.response is not None:
-                error_details += f"Status Code: {e.response.status_code}\n"
-                error_details += f"Response Content: {e.response.text}\n"
-                error_details += f"Request URL: {e.response.url}\n"
-                error_details += f"Request Method: {e.response.request.method}\n"
-                error_details += f"Request Headers: {e.response.request.headers}\n"
-                error_details += f"Request Body: {e.response.request.body}\n"
+                # Check if response is an object with status_code or a dict with 'status_code' key
+                if hasattr(e.response, 'status_code'):
+                    error_details += f"Status Code: {e.response.status_code}\n"
+                elif isinstance(e.response, dict) and 'status_code' in e.response:
+                    error_details += f"Status Code: {e.response['status_code']}\n"
+                
+                # Check for text attribute or key    
+                if hasattr(e.response, 'text'):
+                    error_details += f"Response Content: {e.response.text}\n"
+                elif isinstance(e.response, dict) and 'text' in e.response:
+                    error_details += f"Response Content: {e.response['text']}\n"
+                
+                # Add URL, method, headers, and body if available
+                if hasattr(e.response, 'url'):
+                    error_details += f"Request URL: {e.response.url}\n"
+                elif isinstance(e.response, dict) and 'url' in e.response:
+                    error_details += f"Request URL: {e.response['url']}\n"
+                
+                if hasattr(e.response, 'request') and e.response.request is not None:
+                    if hasattr(e.response.request, 'method'):
+                        error_details += f"Request Method: {e.response.request.method}\n"
+                    if hasattr(e.response.request, 'headers'):
+                        error_details += f"Request Headers: {e.response.request.headers}\n"
+                    if hasattr(e.response.request, 'body'):
+                        error_details += f"Request Body: {e.response.request.body}\n"
             
             logger.error(error_details)
             send_message(
@@ -389,12 +417,31 @@ async def handle_submit_reward(message: Dict[str, Any]) -> None:
         
         # Get additional details if it's an HTTP error
         if hasattr(e, 'response') and e.response is not None:
-            error_details += f"Status Code: {e.response.status_code}\n"
-            error_details += f"Response Content: {e.response.text}\n"
-            error_details += f"Request URL: {e.response.url}\n"
-            error_details += f"Request Method: {e.response.request.method}\n"
-            error_details += f"Request Headers: {e.response.request.headers}\n"
-            error_details += f"Request Body: {e.response.request.body}\n"
+            # Check if response is an object with status_code or a dict with 'status_code' key
+            if hasattr(e.response, 'status_code'):
+                error_details += f"Status Code: {e.response.status_code}\n"
+            elif isinstance(e.response, dict) and 'status_code' in e.response:
+                error_details += f"Status Code: {e.response['status_code']}\n"
+                
+            # Check for text attribute or key    
+            if hasattr(e.response, 'text'):
+                error_details += f"Response Content: {e.response.text}\n"
+            elif isinstance(e.response, dict) and 'text' in e.response:
+                error_details += f"Response Content: {e.response['text']}\n"
+                
+            # Add URL, method, headers, and body if available
+            if hasattr(e.response, 'url'):
+                error_details += f"Request URL: {e.response.url}\n"
+            elif isinstance(e.response, dict) and 'url' in e.response:
+                error_details += f"Request URL: {e.response['url']}\n"
+                
+            if hasattr(e.response, 'request') and e.response.request is not None:
+                if hasattr(e.response.request, 'method'):
+                    error_details += f"Request Method: {e.response.request.method}\n"
+                if hasattr(e.response.request, 'headers'):
+                    error_details += f"Request Headers: {e.response.request.headers}\n"
+                if hasattr(e.response.request, 'body'):
+                    error_details += f"Request Body: {e.response.request.body}\n"
         
         logger.error(error_details)
         send_message(chat_id, f"❌ Failed to submit reward: {str(e)}")
@@ -437,12 +484,31 @@ async def initialize_bot() -> None:
         
         # Get additional details if it's an HTTP error
         if hasattr(e, 'response') and e.response is not None:
-            error_details += f"Status Code: {e.response.status_code}\n"
-            error_details += f"Response Content: {e.response.text}\n"
-            error_details += f"Request URL: {e.response.url}\n"
-            error_details += f"Request Method: {e.response.request.method}\n"
-            error_details += f"Request Headers: {e.response.request.headers}\n"
-            error_details += f"Request Body: {e.response.request.body}\n"
+            # Check if response is an object with status_code or a dict with 'status_code' key
+            if hasattr(e.response, 'status_code'):
+                error_details += f"Status Code: {e.response.status_code}\n"
+            elif isinstance(e.response, dict) and 'status_code' in e.response:
+                error_details += f"Status Code: {e.response['status_code']}\n"
+                
+            # Check for text attribute or key    
+            if hasattr(e.response, 'text'):
+                error_details += f"Response Content: {e.response.text}\n"
+            elif isinstance(e.response, dict) and 'text' in e.response:
+                error_details += f"Response Content: {e.response['text']}\n"
+                
+            # Add URL, method, headers, and body if available
+            if hasattr(e.response, 'url'):
+                error_details += f"Request URL: {e.response.url}\n"
+            elif isinstance(e.response, dict) and 'url' in e.response:
+                error_details += f"Request URL: {e.response['url']}\n"
+                
+            if hasattr(e.response, 'request') and e.response.request is not None:
+                if hasattr(e.response.request, 'method'):
+                    error_details += f"Request Method: {e.response.request.method}\n"
+                if hasattr(e.response.request, 'headers'):
+                    error_details += f"Request Headers: {e.response.request.headers}\n"
+                if hasattr(e.response.request, 'body'):
+                    error_details += f"Request Body: {e.response.request.body}\n"
         
         logger.error(error_details)
 
@@ -485,11 +551,30 @@ def set_bot_commands(chat_id: int) -> None:
         
         # Get additional details if it's an HTTP error
         if hasattr(e, 'response') and e.response is not None:
-            error_details += f"Status Code: {e.response.status_code}\n"
-            error_details += f"Response Content: {e.response.text}\n"
-            error_details += f"Request URL: {e.response.url}\n"
-            error_details += f"Request Method: {e.response.request.method}\n"
-            error_details += f"Request Headers: {e.response.request.headers}\n"
-            error_details += f"Request Body: {e.response.request.body}\n"
+            # Check if response is an object with status_code or a dict with 'status_code' key
+            if hasattr(e.response, 'status_code'):
+                error_details += f"Status Code: {e.response.status_code}\n"
+            elif isinstance(e.response, dict) and 'status_code' in e.response:
+                error_details += f"Status Code: {e.response['status_code']}\n"
+                
+            # Check for text attribute or key    
+            if hasattr(e.response, 'text'):
+                error_details += f"Response Content: {e.response.text}\n"
+            elif isinstance(e.response, dict) and 'text' in e.response:
+                error_details += f"Response Content: {e.response['text']}\n"
+                
+            # Add URL, method, headers, and body if available
+            if hasattr(e.response, 'url'):
+                error_details += f"Request URL: {e.response.url}\n"
+            elif isinstance(e.response, dict) and 'url' in e.response:
+                error_details += f"Request URL: {e.response['url']}\n"
+                
+            if hasattr(e.response, 'request') and e.response.request is not None:
+                if hasattr(e.response.request, 'method'):
+                    error_details += f"Request Method: {e.response.request.method}\n"
+                if hasattr(e.response.request, 'headers'):
+                    error_details += f"Request Headers: {e.response.request.headers}\n"
+                if hasattr(e.response.request, 'body'):
+                    error_details += f"Request Body: {e.response.request.body}\n"
         
         logger.error(error_details)
