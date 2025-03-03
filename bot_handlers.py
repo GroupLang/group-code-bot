@@ -44,7 +44,16 @@ async def handle_update(update: Dict[str, Any]) -> None:
             store_message(reaction_message['chat']['id'], reaction_message)
             
     except Exception as e:
-        logger.error(f"Error handling update: {e}")
+        import traceback
+        error_details = f"Error handling update: {e}\n"
+        error_details += f"Traceback: {traceback.format_exc()}\n"
+        
+        # Get additional details if it's an HTTP error
+        if hasattr(e, 'response') and e.response is not None:
+            error_details += f"Status Code: {e.response.status_code}\n"
+            error_details += f"Response Content: {e.response.text}\n"
+        
+        logger.error(error_details)
 
 async def handle_code_request(message: Dict[str, Any]) -> None:
     """Handle code request commands"""
@@ -166,10 +175,23 @@ async def handle_github_issue_link(message: Dict[str, Any]) -> None:
                 parse_mode='MarkdownV2'
             )
         except Exception as e:
-            logger.error(f"Error handling GitHub issue: {e}")
+            import traceback
+            error_details = f"Error handling GitHub issue: {e}\n"
+            error_details += f"Traceback: {traceback.format_exc()}\n"
+            
+            # Get additional details if it's an HTTP error
+            if hasattr(e, 'response') and e.response is not None:
+                error_details += f"Status Code: {e.response.status_code}\n"
+                error_details += f"Response Content: {e.response.text}\n"
+                error_details += f"Request URL: {e.response.url}\n"
+                error_details += f"Request Method: {e.response.request.method}\n"
+                error_details += f"Request Headers: {e.response.request.headers}\n"
+                error_details += f"Request Body: {e.response.request.body}\n"
+            
+            logger.error(error_details)
             send_message(
                 chat_id,
-                f"❌ Failed to process GitHub issue {e}. Please try again later.",
+                f"❌ Failed to process GitHub issue: {str(e)}. Please try again later.",
             )
 
 async def handle_new_chat_members(message: Dict[str, Any]) -> None:
@@ -303,7 +325,20 @@ async def handle_submit_reward(message: Dict[str, Any]) -> None:
     except ValueError:
         send_message(chat_id, "❌ Amount must be a valid number")
     except Exception as e:
-        logger.error(f"Error submitting reward: {e}")
+        import traceback
+        error_details = f"Error submitting reward: {e}\n"
+        error_details += f"Traceback: {traceback.format_exc()}\n"
+        
+        # Get additional details if it's an HTTP error
+        if hasattr(e, 'response') and e.response is not None:
+            error_details += f"Status Code: {e.response.status_code}\n"
+            error_details += f"Response Content: {e.response.text}\n"
+            error_details += f"Request URL: {e.response.url}\n"
+            error_details += f"Request Method: {e.response.request.method}\n"
+            error_details += f"Request Headers: {e.response.request.headers}\n"
+            error_details += f"Request Body: {e.response.request.body}\n"
+        
+        logger.error(error_details)
         send_message(chat_id, f"❌ Failed to submit reward: {str(e)}")
 
 async def initialize_bot() -> None:
@@ -338,7 +373,20 @@ async def initialize_bot() -> None:
         response.raise_for_status()
         logger.info("Successfully set global bot commands")
     except Exception as e:
-        logger.error(f"Failed to set bot commands: {e}")
+        import traceback
+        error_details = f"Failed to set bot commands: {e}\n"
+        error_details += f"Traceback: {traceback.format_exc()}\n"
+        
+        # Get additional details if it's an HTTP error
+        if hasattr(e, 'response') and e.response is not None:
+            error_details += f"Status Code: {e.response.status_code}\n"
+            error_details += f"Response Content: {e.response.text}\n"
+            error_details += f"Request URL: {e.response.url}\n"
+            error_details += f"Request Method: {e.response.request.method}\n"
+            error_details += f"Request Headers: {e.response.request.headers}\n"
+            error_details += f"Request Body: {e.response.request.body}\n"
+        
+        logger.error(error_details)
 
 def set_bot_commands(chat_id: int) -> None:
     """Set up the bot's commands for a group chat with proper scope and language support."""
@@ -371,6 +419,19 @@ def set_bot_commands(chat_id: int) -> None:
     try:
         commands_response = requests.post(commands_url, json=commands_payload)
         commands_response.raise_for_status()  # Raise exception for non-200 status codes
-        print(f"Successfully set commands for chat {chat_id}")
+        logger.info(f"Successfully set commands for chat {chat_id}")
     except Exception as e:
-        print(f"Error setting commands: {str(e)}")
+        import traceback
+        error_details = f"Error setting commands for chat {chat_id}: {e}\n"
+        error_details += f"Traceback: {traceback.format_exc()}\n"
+        
+        # Get additional details if it's an HTTP error
+        if hasattr(e, 'response') and e.response is not None:
+            error_details += f"Status Code: {e.response.status_code}\n"
+            error_details += f"Response Content: {e.response.text}\n"
+            error_details += f"Request URL: {e.response.url}\n"
+            error_details += f"Request Method: {e.response.request.method}\n"
+            error_details += f"Request Headers: {e.response.request.headers}\n"
+            error_details += f"Request Body: {e.response.request.body}\n"
+        
+        logger.error(error_details)

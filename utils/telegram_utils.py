@@ -40,9 +40,20 @@ def send_message(chat_id: int, text: str, reply_markup: Optional[Dict] = None,
     if reply_to_message_id:
         data['reply_to_message_id'] = reply_to_message_id
 
-    response = requests.post(url, json=data)
-    response.raise_for_status()
-    return response.json()
+    try:
+        response = requests.post(url, json=data)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.HTTPError as e:
+        # Get the full error details from the response
+        error_details = f"HTTP Error: {e}\n"
+        if hasattr(e, 'response') and e.response is not None:
+            error_details += f"Status Code: {e.response.status_code}\n"
+            error_details += f"Response Content: {e.response.text}\n"
+            error_details += f"Request Data: {data}\n"
+        print(f"Telegram API Error: {error_details}")
+        # Re-raise the exception to maintain the original behavior
+        raise
 
 def edit_message(chat_id: int, message_id: int, text: str, 
                 reply_markup: Optional[Dict] = None) -> Dict[str, Any]:
@@ -59,6 +70,17 @@ def edit_message(chat_id: int, message_id: int, text: str,
     if reply_markup:
         data['reply_markup'] = reply_markup
 
-    response = requests.post(url, json=data)
-    response.raise_for_status()
-    return response.json()
+    try:
+        response = requests.post(url, json=data)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.HTTPError as e:
+        # Get the full error details from the response
+        error_details = f"HTTP Error: {e}\n"
+        if hasattr(e, 'response') and e.response is not None:
+            error_details += f"Status Code: {e.response.status_code}\n"
+            error_details += f"Response Content: {e.response.text}\n"
+            error_details += f"Request Data: {data}\n"
+        print(f"Telegram API Error: {error_details}")
+        # Re-raise the exception to maintain the original behavior
+        raise
