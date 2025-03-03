@@ -140,6 +140,7 @@ I help manage code requests and GitHub issues in this group.
    • For public repos: Just share the repo URL
    • For private repos: Add `agentMarketBot` as collaborator first
 3. Add specific GitHub issues to solve
+• Note: Chat messages are considered for instance creation and provider conversations
 
 {Emoji.CHAT} *Chat with Providers*:
 Two ways to reply:
@@ -165,6 +166,7 @@ HELP_MESSAGE = f"""
 • Share a GitHub issue link to start a discussion
 • Chat with providers using @provider_id your message
 • Use {Emoji.BROOM} `/clear` to clean up chat history
+• Note: Chat messages are considered for instance creation and provider conversations
 
 {Emoji.CHAT} *Provider Chat:*
 • Provider IDs look like: abc123-def456
