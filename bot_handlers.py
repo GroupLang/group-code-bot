@@ -5,6 +5,12 @@ from typing import Dict, Any, Optional
 import requests
 from loguru import logger
 
+from utils.message_storage import (
+    Config,
+    get_chat_history,
+    store_message,
+    add_chat_id_if_reply
+)
 from services.bot.messages import (
     WELCOME_MESSAGE,
     HELP_MESSAGE,
@@ -16,6 +22,7 @@ from services.client import AgentMarketClient
 from services.request_tracker import RequestTracker
 from services.bot.provider import send_message_to_provider, parse_provider_mention
 from utils.telegram_utils import send_message, escape_markdown
+from utils.message_storage import get_from_reaction_to_message
 
 BOT_MENTION_PATTERN = r'@group_code_bot\s+(.*)'
 GITHUB_ISSUE_PATTERN = r'(?:https?://)?github\.com/([^/]+)/([^/]+)/issues/(\d+)'
@@ -30,6 +37,9 @@ async def handle_update(update: Dict[str, Any]) -> None:
     try:
         if 'message' in update:
             await handle_message(update['message'])
+        elif 'message_reaction' in update and update['message_reaction'].get('new_reaction'):
+            reaction_message = get_from_reaction_to_message(update['message_reaction'])
+            store_message(reaction_message['chat']['id'], reaction_message)
             
     except Exception as e:
         logger.error(f"Error handling update: {e}")
@@ -201,6 +211,15 @@ async def handle_message(message: Dict[str, Any]) -> None:
     
     if 'text' not in message:
         return
+
+    if 'reply_to_message' in message:
+        replied_to_bot = message['reply_to_message'].get('from', {}).get('username') == 'group_code_bot'
+        if not replied_to_bot:
+            message['text'] = add_chat_id_if_reply(message)
+    
+    # Store message in chat history
+    chat_id = message['chat']['id']
+    store_message(chat_id, message)
         
     text = message['text']
     
