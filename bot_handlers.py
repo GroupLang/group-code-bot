@@ -282,6 +282,16 @@ async def handle_provider_reply(message: Dict[str, Any], replied_msg: Dict[str, 
         instance_info = replied_msg['text'].split('for instance: ')[1]
         instance_id = re.search(r'\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b', instance_info).group(0)
 
+        chat_history = await get_chat_history(chat_id)
+    
+        conversation = "\nPrevious conversation:\n"
+        for msg in chat_history:
+            username = msg.get('username', 'unknown')
+            text = msg.get('text', '')
+            conversation += f"{username}: {text}\n"
+
+        text = f"{text}\n{conversation}"
+
         await send_message_to_provider(chat_id, provider_id, text, instance_id=instance_id)
         return True
     except (IndexError, ValueError):
@@ -301,6 +311,17 @@ async def handle_provider_mention(message: Dict[str, Any]) -> bool:
         return False
         
     provider_id, message_content, instance_id = provider_info
+
+    chat_history = await get_chat_history(chat_id)
+    
+    conversation = "\nPrevious conversation:\n"
+    for msg in chat_history:
+        username = msg.get('username', 'unknown')
+        text = msg.get('text', '')
+        conversation += f"{username}: {text}\n"
+
+    message_content = f"{message_content}\n{conversation}"
+    
     await send_message_to_provider(chat_id, provider_id, message_content, instance_id=instance_id)
     return True
 
