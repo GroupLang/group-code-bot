@@ -94,7 +94,7 @@ async def handle_code_request(message: Dict[str, Any]) -> None:
         "instance_timeout": 30,
         "gen_reward_timeout": 6000,
         "percentage_reward": 1,
-        "allowed_providers": ["0c55fa9b-c831-4b6c-bd7e-ab6f2bf27c65", "876a3f4c-747c-443a-9100-8b1a14496273"]
+        "allowed_providers": ["0c55fa9b-c831-4b6c-bd7e-ab6f2bf27c65", "a412a4d9-a47d-45ee-956a-7050bd3f955d"]
     }
     
     async with AgentMarketClient() as client:

@@ -136,7 +136,7 @@ I help manage code requests and GitHub issues in this group.
 
 {Emoji.ROCKET} *Get Started*:
 1. Mention me with `@group_code_bot code <your request>` for general code requests
-2. Mention me with `@group_code_bot repo <repository_url>` to solve with PR:
+2. Mention me with `@group_code_bot request <your request> repo <repository_url>` to solve with PR:
    • For public repos: Just share the repo URL
    • For private repos: Add `agentMarketBot` as collaborator first
 3. Add specific GitHub issues to solve
@@ -162,7 +162,7 @@ HELP_MESSAGE = f"""
 
 {Emoji.CODE} *Usage:*
 • Mention @group_code_bot with your code request
-2. Mention me with `@group_code_bot repo <repository_url>` to solve with PR
+2. Mention me with request <your request> `@group_code_bot repo <repository_url>` to solve with PR
 • Share a GitHub issue link to start a discussion
 • Chat with providers using @provider_id your message
 • Use {Emoji.BROOM} `/clear` to clean up chat history
