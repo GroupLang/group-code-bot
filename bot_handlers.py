@@ -1,6 +1,7 @@
 import os
 import re
 import time
+import asyncio
 from typing import Dict, Any, Optional
 import requests
 from loguru import logger
@@ -199,8 +200,14 @@ async def handle_new_chat_members(message: Dict[str, Any]) -> None:
     chat_id = message['chat']['id']
     for member in message['new_chat_members']:
         if member.get('username') == "group_code_bot":
-            set_bot_commands(chat_id)
-            send_message(chat_id, WELCOME_MESSAGE)
+            try:
+                set_bot_commands(chat_id)
+                # Add small delay before sending welcome message to ensure bot is fully initialized in the chat
+                await asyncio.sleep(1)
+                send_message(chat_id, WELCOME_MESSAGE, parse_mode='MarkdownV2')
+            except Exception as e:
+                logger.error(f"Failed to send welcome message to chat {chat_id}: {e}")
+                # We'll log but not re-raise the error to prevent the function from failing completely
 
 async def handle_provider_reply(message: Dict[str, Any], replied_msg: Dict[str, Any]) -> bool:
     """Handle replies to provider messages"""
