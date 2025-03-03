@@ -341,11 +341,11 @@ async def handle_message(message: Dict[str, Any]) -> None:
         return
 
     # Handle non-command messages
-    if re.search(GITHUB_ISSUE_PATTERN, text):
-        await handle_github_issue_link(message)
-        return
     elif '@group_code_bot' in text.lower():
         await handle_code_request(message)
+        return
+    if re.search(GITHUB_ISSUE_PATTERN, text):
+        await handle_github_issue_link(message)
         return
     
 
