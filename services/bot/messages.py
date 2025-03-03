@@ -63,6 +63,7 @@ class Emoji:
     GITHUB = "📦"
     CODE = "💻"
     LINK = "🔗"
+    BROOM = "🧹"
 
 # Command related message templates
 COMMAND_MESSAGES: Dict[str, MessageTemplate] = {
@@ -128,11 +129,12 @@ I help manage code requests and GitHub issues in this group.
 • Chat directly with providers using their ID
 • Review and approve solutions with reactions
 • Submit rewards for completed tasks
+• Clear chat history when needed
 
 {Emoji.MEMO} *Quick Commands*:
-• `{COMMAND_USAGE['help']}` - View all commands
-• `{COMMAND_USAGE['clear']}` - Clear chat history
-• `{COMMAND_USAGE['submit_reward']}` - Submit rewards
+• `{COMMAND_USAGE['help'].usage}` - View all commands
+• `{COMMAND_USAGE['clear'].usage}` - {COMMAND_USAGE['clear'].description}
+• `{COMMAND_USAGE['submit_reward'].usage}` - Submit rewards
 
 {Emoji.ROCKET} *Get Started*:
 1. Share a GitHub issue or
@@ -144,7 +146,7 @@ Two ways to reply:
 2. Using format: `@provider_id <instance_id> your message`
 Example: `@abc123-def456 instance_789 Can you explain this part?`
 
-Need help? Type `{COMMAND_USAGE['help']}` anytime!
+Need help? Type `{COMMAND_USAGE['help'].usage}` anytime!
 """
 
 # Help message with consistent formatting
@@ -152,14 +154,15 @@ HELP_MESSAGE = f"""
 {Emoji.INFO} *Group Code Bot Help*
 
 {Emoji.MEMO} *Commands:*
-• `{COMMAND_USAGE['clear']}` - Clear chat history and unresolved requests
-• `{COMMAND_USAGE['help']}` - Show this help message
-• `{COMMAND_USAGE['submit_reward']}` - Submit reward for an instance
+• `{COMMAND_USAGE['help'].usage}` - {COMMAND_USAGE['help'].description}
+• `{COMMAND_USAGE['clear'].usage}` - {COMMAND_USAGE['clear'].description}
+• `{COMMAND_USAGE['submit_reward'].usage}` - {COMMAND_USAGE['submit_reward'].description}
 
 {Emoji.CODE} *Usage:*
 • Mention @group_code_bot with your code request
 • Share a GitHub issue link to start a discussion
 • Chat with providers using @provider_id your message
+• Use {Emoji.BROOM} `/clear` to clean up chat history
 
 {Emoji.CHAT} *Provider Chat:*
 • Provider IDs look like: abc123-def456
@@ -270,7 +273,14 @@ SUCCESS_MESSAGES: Dict[str, MessageTemplate] = {
     
     # GitHub related
     "issue_tracked": f"{Emoji.SUCCESS} Now tracking GitHub issue: {{}}",
-    "pr_linked": f"{Emoji.SUCCESS} Pull request linked to instance {{}}"
+    "pr_linked": f"{Emoji.SUCCESS} Pull request linked to instance {{}}",
+    
+    # Chat history related
+    "history_cleared": MessageTemplate(
+        template=f"{Emoji.SUCCESS} Chat history cleared successfully!",
+        category=MessageCategory.SUCCESS,
+        placeholders=[]
+    )
 }
 
 # Provider message templates with validation
@@ -313,52 +323,6 @@ GITHUB_MESSAGES: Dict[str, MessageTemplate] = {
         f"{Emoji.LINK} {{url}}"
     )
 }
-"""Message constants for the bot."""
-
-WELCOME_MESSAGE = (
-    "👋 *Welcome to Group Code Bot!*\n\n"
-    "I help manage code requests and GitHub issues in this group.\n\n"
-    "🔧 *Key Features*:\n"
-    "• Create code requests by mentioning me with your request\n"
-    "• Share GitHub issues for automated tracking\n"
-    "• Chat directly with providers using their ID\n"
-    "• Review and approve solutions with reactions\n"
-    "• Submit rewards for completed tasks\n\n"
-    "📝 *Quick Commands*:\n"
-    "• `/help` - View all commands\n"
-    "• `/clear` - Clear chat history\n"
-    "• `/submit_reward <instance_id> <amount>` - Submit rewards \n\n"
-    "🚀 *Get Started*:\n"
-    "1. Share a GitHub issue or\n"
-    "2. Mention me with `@group_code_bot code <your request>`\n"
-    "⚠️ *Note*: For private repositories, you must grant read access to **agentmarketbot**\n\n"
-    "💬 *Chat with Providers*:\n"
-    "Two ways to reply:\n"
-    "1. Direct reply to provider message\n"
-    "2. Using format: `@provider_id <instance_id> your message`\n"
-    "Example: `@abc123-def456 instance_789 Can you explain this part?`\n\n"
-    "Need help? Type `/help` anytime!"
-)
-
-HELP_MESSAGE = (
-    "*Group Code Bot Help*\n\n"
-    "*Commands:*\n"
-    "• /balance - Check your wallet balance\n"
-    "• /clear - Clear chat history and unresolved requests\n"
-    "• /help - Show this help message\n"
-    "• /submit\\_reward <instance\\_id> <amount> - Submit reward for an instance\n\n"
-    "*Usage:*\n"
-    "• Mention @group\\_code\\_bot with your code request\n"
-    "• Share a GitHub issue link to start a discussion\n"
-    "• Chat with providers using @provider\\_id your message\n"
-    "• For private repositories, grant read access to **agentmarketbot**\n\n"
-    "*Provider Chat:*\n"
-    "• Provider IDs look like: abc123\\-def456\n"
-    "• Two ways to reply to providers:\n"
-    "  1. Simply reply to their message\n"
-    "  2. Use format: @provider\\_id <instance\\_id> your message\n"
-    "• You'll receive their replies in the group chat"
-)
 
 INVALID_REWARD_FORMAT = (
     "❌ Invalid format. Use:\n"

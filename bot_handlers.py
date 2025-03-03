@@ -9,13 +9,15 @@ from utils.message_storage import (
     Config,
     get_chat_history,
     store_message,
-    add_chat_id_if_reply
+    add_chat_id_if_reply,
+    clear_chat_history
 )
 from services.bot.messages import (
     WELCOME_MESSAGE,
     HELP_MESSAGE,
     INVALID_REWARD_FORMAT,
-    REWARD_SUCCESS
+    REWARD_SUCCESS,
+    SUCCESS_MESSAGES
 )
 
 from services.client import AgentMarketClient
@@ -48,6 +50,16 @@ async def handle_code_request(message: Dict[str, Any]) -> None:
     """Handle code request commands"""
     chat_id = message['chat']['id']
     command_text = message['text'].lower().split('@group_code_bot', 1)[1].strip()
+    
+    chat_history = await get_chat_history(chat_id)
+    
+    conversation = "\nPrevious conversation:\n"
+    for msg in chat_history:
+        username = msg.get('username', 'unknown')
+        text = msg.get('text', '')
+        conversation += f"{username}: {text}\n"
+    
+    command_text = f"{command_text}\n{conversation}"
     
     if not command_text:
         send_message(
@@ -240,7 +252,7 @@ async def handle_message(message: Dict[str, Any]) -> None:
         return
 
     # Handle non-command messages
-    if 'github.com' in text.lower():
+    if re.search(GITHUB_ISSUE_PATTERN, text):
         await handle_github_issue_link(message)
         return
     elif '@group_code_bot' in text.lower():
@@ -264,6 +276,11 @@ async def handle_command(message: Dict[str, Any], command: str) -> bool:
         
     if command.startswith('/submit_reward'):
         await handle_submit_reward(message)
+        return True
+        
+    if command.startswith('/clear'):
+        await clear_chat_history(chat_id)
+        send_message(chat_id, SUCCESS_MESSAGES["history_cleared"].template)
         return True
         
     return False
@@ -309,6 +326,10 @@ async def initialize_bot() -> None:
         {
             "command": "submit_reward",
             "description": "Submit reward for an instance"
+        },
+        {
+            "command": "clear",
+            "description": "Clear chat history"
         }
     ]
     
@@ -330,6 +351,10 @@ def set_bot_commands(chat_id: int) -> None:
         {
             "command": "submit_reward",
             "description": "Submit reward for an instance"
+        },
+        {
+            "command": "clear",
+            "description": "Clear chat history"
         }
     ]
     

@@ -11,7 +11,7 @@ class Config:
     _dynamodb = boto3.resource('dynamodb')
     _table = _dynamodb.Table(os.environ.get('DYNAMODB_TABLE_NAME', 'agent_requests'))
 
-async def get_chat_history(chat_id: int, limit: int = 10) -> List[Dict[str, Any]]:
+async def get_chat_history(chat_id: int, limit: int = 100) -> List[Dict[str, Any]]:
     """Fetch recent messages from chat history stored in DynamoDB"""
     try:
         # Get messages from DynamoDB
@@ -110,3 +110,16 @@ def get_from_reaction_to_message(message_reaction: Dict[str, Any]) -> Dict[str, 
         'text': f"{emoji} to message_id: {message_id}"
     }
     return reaction_message
+
+async def clear_chat_history(chat_id: int) -> None:
+    """Clear all messages for a specific chat_id from DynamoDB"""
+    try:
+        # Update the item to have an empty messages array
+        Config._table.update_item(
+            Key={'chat_id': str(chat_id)},
+            UpdateExpression='SET messages = :empty_list',
+            ExpressionAttributeValues={':empty_list': []}
+        )
+    except Exception as e:
+        logger.error(f"Error clearing chat history: {e}")
+        raise e
