@@ -77,6 +77,9 @@ async def handle_code_request(message: Dict[str, Any]) -> None:
     for msg in chat_history:
         username = msg.get('username', 'unknown')
         text = msg.get('text', '')
+        # Remove GitHub links
+        text = re.sub(r'https?://github\.com/\S+', '', text)
+        text = re.sub(r'github\.com/\S+', '', text)
         conversation += f"{username}: {text}\n"
     
     command_text = f"{command_text}\n{conversation}"
@@ -289,6 +292,9 @@ async def handle_provider_reply(message: Dict[str, Any], replied_msg: Dict[str, 
         for msg in chat_history:
             username = msg.get('username', 'unknown')
             text = msg.get('text', '')
+            # Remove GitHub links
+            text = re.sub(r'https?://github\.com/\S+', '', text)
+            text = re.sub(r'github\.com/\S+', '', text)
             conversation += f"{username}: {text}\n"
 
         text = f"{text}\n{conversation}"
@@ -319,6 +325,9 @@ async def handle_provider_mention(message: Dict[str, Any]) -> bool:
     for msg in chat_history:
         username = msg.get('username', 'unknown')
         text = msg.get('text', '')
+        # Remove GitHub links
+        text = re.sub(r'https?://github\.com/\S+', '', text)
+        text = re.sub(r'github\.com/\S+', '', text)
         conversation += f"{username}: {text}\n"
 
     message_content = f"{message_content}\n{conversation}"
